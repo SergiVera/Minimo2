@@ -5,8 +5,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Recycler extends RecyclerView.Adapter<Recycler.ViewHolder> {
@@ -14,10 +16,15 @@ public class Recycler extends RecyclerView.Adapter<Recycler.ViewHolder> {
 
     //Asign the text TextView to the text1 in the layout
     public class ViewHolder extends RecyclerView.ViewHolder {
+        public TextView followerNameView;
+        public ImageView photoFollower;
         public TextView text;
 
         public ViewHolder(View v) {
             super(v);
+            followerNameView = v.findViewById(R.id.followerNameView);
+            photoFollower = v.findViewById(R.id.photoFollower);
+
             text = (TextView) v.findViewById(android.R.id.text1);
         }
     }
@@ -36,15 +43,19 @@ public class Recycler extends RecyclerView.Adapter<Recycler.ViewHolder> {
 
     @Override
     public void onBindViewHolder(Recycler.ViewHolder holder, int position) {
-        User userdata = ((User) data.get(position));
-        holder.text.setText(userdata.toString());
-        holder.itemView.setTag(userdata.id);
+        User userData = ((User) data.get(position));
+        holder.itemView.setTag(userData.id);
+        holder.text.setText(userData.toString());
     }
 
     @Override
     public int getItemCount() {
         return data.size();
     }
+
+
+
+
 }
 
 

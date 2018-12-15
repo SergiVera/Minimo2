@@ -22,7 +22,7 @@ public interface APIRest {
 
     //We add the GET method to obtain the followers of the user
     @GET("{username}/followers")
-    Call<Followers> getFollowers(@Path("username") String username);
+    Call<List<User>> getFollowers(@Path("username") String username);
 
     static APIRest createAPIRest() {
         Gson gson = new GsonBuilder()

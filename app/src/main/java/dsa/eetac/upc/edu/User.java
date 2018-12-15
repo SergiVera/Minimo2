@@ -79,4 +79,8 @@ class User {
     public void setAvatar_url(String avatar_url) {
         this.avatar_url = avatar_url;
     }
+
+    public String toString() {
+        return(login);
+    }
 }
