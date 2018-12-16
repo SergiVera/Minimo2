@@ -128,13 +128,37 @@ public class FollowersActivity extends MainActivity{
                 recyclerView.setAdapter(new Recycler(followersList));
             }
             else{
+                Log.e("No api connection", response.message());
 
+                //Show the alert dialog
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(FollowersActivity.this);
+
+                alertDialogBuilder
+                        .setTitle("Error")
+                        .setMessage(response.message())
+                        .setCancelable(false)
+                        .setPositiveButton("OK", (dialog, which) -> finish());
+
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
             }
         }
 
         @Override
         public void onFailure(Call<List<User>> call, Throwable t) {
             Log.e("No api connection: ", t.getMessage());
+
+            //Show the alert dialog
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(FollowersActivity.this);
+
+            alertDialogBuilder
+                    .setTitle("Error")
+                    .setMessage(t.getMessage())
+                    .setCancelable(false)
+                    .setPositiveButton("OK", (dialog, which) -> finish());
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
         }
     };
 
