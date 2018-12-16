@@ -57,7 +57,7 @@ public class FollowersActivity extends MainActivity{
 
         getProfile();
 
-       myapirest.getFollowers(message).enqueue(followersCalllback);
+        getFollowers();
 
     }
 
@@ -119,48 +119,55 @@ public class FollowersActivity extends MainActivity{
         });
     }
 
-    Callback<List<User>> followersCalllback = new Callback<List<User>>() {
-        @Override
-        public void onResponse(Call<List<User>> call, Response<List<User>> response) {
-            if(response.isSuccessful()) {
-                List<User> followersList = response.body();
-                followersList.addAll(response.body());
-                recyclerView.setAdapter(new Recycler(followersList));
+    public void getFollowers(){
+        Call<List<User>> userCall = myapirest.getFollowers(message);
+
+        userCall.enqueue(new Callback<List<User>>() {
+            @Override
+            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                if(response.isSuccessful()) {
+                    List<User> followersList = response.body();
+                    followersList.addAll(response.body());
+                    recyclerView.setAdapter(new Recycler(followersList));
+
+                    for(int i = 0; i < followersList.size(); i++)
+                        Log.i("Login: " + followersList.get(i).login, response.message());
+                }
+                else{
+                    Log.e("No api connection", response.message());
+
+                    //Show the alert dialog
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(FollowersActivity.this);
+
+                    alertDialogBuilder
+                            .setTitle("Error")
+                            .setMessage(response.message())
+                            .setCancelable(false)
+                            .setPositiveButton("OK", (dialog, which) -> finish());
+
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                }
             }
-            else{
-                Log.e("No api connection", response.message());
+
+            @Override
+            public void onFailure(Call<List<User>> call, Throwable t) {
+                Log.e("No api connection: ", t.getMessage());
 
                 //Show the alert dialog
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(FollowersActivity.this);
 
                 alertDialogBuilder
                         .setTitle("Error")
-                        .setMessage(response.message())
+                        .setMessage(t.getMessage())
                         .setCancelable(false)
                         .setPositiveButton("OK", (dialog, which) -> finish());
 
                 AlertDialog alertDialog = alertDialogBuilder.create();
                 alertDialog.show();
             }
-        }
-
-        @Override
-        public void onFailure(Call<List<User>> call, Throwable t) {
-            Log.e("No api connection: ", t.getMessage());
-
-            //Show the alert dialog
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(FollowersActivity.this);
-
-            alertDialogBuilder
-                    .setTitle("Error")
-                    .setMessage(t.getMessage())
-                    .setCancelable(false)
-                    .setPositiveButton("OK", (dialog, which) -> finish());
-
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
-        }
-    };
+        });
+    }
 
     @Override
     protected void onResume() {

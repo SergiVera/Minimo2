@@ -44,7 +44,6 @@ public class Recycler extends RecyclerView.Adapter<Recycler.ViewHolder> {
     @Override
     public void onBindViewHolder(Recycler.ViewHolder holder, int position) {
         User userData = ((User) data.get(position));
-        holder.itemView.setTag(userData.id);
         holder.text.setText(userData.toString());
     }
 
