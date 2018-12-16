@@ -40,8 +40,10 @@ public class FollowersActivity extends MainActivity{
         setContentView(R.layout.activity_followers);
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recycler = new Recycler(this);
+        recyclerView.setAdapter(recycler);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(FollowersActivity.this));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         //TextViews where we show the number of repositories and the number of following
         textViewFollowing = findViewById(R.id.followingView);
@@ -119,7 +121,7 @@ public class FollowersActivity extends MainActivity{
         });
     }
 
-    public void getFollowers(){
+    private void getFollowers(){
         Call<List<User>> userCall = myapirest.getFollowers(message);
 
         userCall.enqueue(new Callback<List<User>>() {
@@ -127,11 +129,13 @@ public class FollowersActivity extends MainActivity{
             public void onResponse(Call<List<User>> call, Response<List<User>> response) {
                 if(response.isSuccessful()) {
                     List<User> followersList = response.body();
-                    followersList.addAll(response.body());
-                    recyclerView.setAdapter(new Recycler(followersList));
 
-                    for(int i = 0; i < followersList.size(); i++)
+                    recycler.addFollowers(followersList);
+
+                    for(int i = 0; i < followersList.size(); i++) {
                         Log.i("Login: " + followersList.get(i).login, response.message());
+                        Log.i("Size of the list: " +followersList.size(), response.message());
+                    }
                 }
                 else{
                     Log.e("No api connection", response.message());
