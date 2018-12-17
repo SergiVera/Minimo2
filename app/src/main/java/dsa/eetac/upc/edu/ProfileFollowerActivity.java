@@ -1,66 +1,54 @@
 package dsa.eetac.upc.edu;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
-public class FollowersActivity extends MainActivity{
+public class ProfileFollowerActivity extends AppCompatActivity {
 
     private APIRest myapirest;
-    private Recycler recycler;
-    private RecyclerView recyclerView;
-
-    public String message;
-    ImageView ivImageFromUrl;
     private String token;
-
+    private String message;
+    ProgressDialog progressDialog;
+    ImageView ivImageFromUrl;
     TextView textViewFollowing;
     TextView textViewRepos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_followers);
-
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        recycler = new Recycler(this);
-        recyclerView.setAdapter(recycler);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        setContentView(R.layout.activity_profile_follower);
 
         //TextViews where we show the number of repositories and the number of following
         textViewFollowing = findViewById(R.id.followingView);
         textViewRepos = findViewById(R.id.repositoriesView);
+        ivImageFromUrl = findViewById(R.id.iv_image_from_url);
 
-        // Get the Intent that started this activity and extract the string
         Intent intent = getIntent();
         message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
 
-        ivImageFromUrl = (ImageView)findViewById(R.id.iv_image_from_url);
+        //Progress loading
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Loading...");
+        progressDialog.setMessage("Waiting for the server");
+        progressDialog.setCancelable(false);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.show();
 
         myapirest = APIRest.createAPIRest();
 
         getProfile();
-
-        getFollowers();
-
     }
 
     private void getProfile() {
@@ -85,11 +73,15 @@ public class FollowersActivity extends MainActivity{
 
                     textViewFollowing.setText(String.valueOf(user.following));
 
+                    progressDialog.hide();
+
                 } else {
                     Log.e("Response failure", String.valueOf(response.errorBody()));
 
+                    progressDialog.hide();
+
                     //Show the alert dialog
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(FollowersActivity.this);
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ProfileFollowerActivity.this);
 
                     alertDialogBuilder
                             .setTitle("Error")
@@ -106,60 +98,10 @@ public class FollowersActivity extends MainActivity{
             public void onFailure(Call<User> call, Throwable t) {
                 Log.e("No api connection", t.getMessage());
 
-                //Show the alert dialog
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(FollowersActivity.this);
-
-                alertDialogBuilder
-                        .setTitle("Error")
-                        .setMessage(t.getMessage())
-                        .setCancelable(false)
-                        .setPositiveButton("OK", (dialog, which) -> finish());
-
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.show();
-            }
-        });
-    }
-
-    private void getFollowers(){
-        Call<List<User>> userCall = myapirest.getFollowers(message);
-
-        userCall.enqueue(new Callback<List<User>>() {
-            @Override
-            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
-                if(response.isSuccessful()) {
-                    List<User> followersList = response.body();
-
-                    recycler.addFollowers(followersList);
-
-                    for(int i = 0; i < followersList.size(); i++) {
-                        Log.i("Login: " + followersList.get(i).login, response.message());
-                        Log.i("Size of the list: " +followersList.size(), response.message());
-                    }
-                }
-                else{
-                    Log.e("No api connection", response.message());
-
-                    //Show the alert dialog
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(FollowersActivity.this);
-
-                    alertDialogBuilder
-                            .setTitle("Error")
-                            .setMessage(response.message())
-                            .setCancelable(false)
-                            .setPositiveButton("OK", (dialog, which) -> finish());
-
-                    AlertDialog alertDialog = alertDialogBuilder.create();
-                    alertDialog.show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<User>> call, Throwable t) {
-                Log.e("No api connection: ", t.getMessage());
+                progressDialog.hide();
 
                 //Show the alert dialog
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(FollowersActivity.this);
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ProfileFollowerActivity.this);
 
                 alertDialogBuilder
                         .setTitle("Error")
